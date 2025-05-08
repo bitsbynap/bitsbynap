@@ -1,0 +1,7 @@
+const ENV = {
+    CONTENTSTACK_API_KEY: import.meta.env.VITE_API_KEY,
+    CONTENTSTACK_DELIVERY_TOKEN: import.meta.env.VITE_DELIVERY_TOKEN,
+    CONTENTSTACK_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
+};
+
+export default ENV;

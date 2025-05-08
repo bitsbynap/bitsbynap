@@ -5,25 +5,26 @@ import { useSection } from "../context/SectionContext";
 import { useScrollToSection } from "../hooks/useScrollToSection";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ENV from "../../env";
 
 const Hero = () => {
   const { activeSection } = useSection();
-
-  //fetch data from contentstack
   const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state to handle async UI
 
   useEffect(() => {
     const fetchEntries = async () => {
-      // Debug environment variables
+      console.log("Fetching data from Contentstack...");
+
       console.log("Environment Variables:", {
-        apiKey: import.meta.env.VITE_API_KEY,
-        deliveryToken: import.meta.env.VITE_DELIVERY_TOKEN,
-        environment: import.meta.env.VITE_ENVIRONMENT,
+        apiKey: ENV.CONTENTSTACK_API_KEY,
+        deliveryToken: ENV.CONTENTSTACK_DELIVERY_TOKEN,
+        environment: ENV.CONTENTSTACK_ENVIRONMENT,
       });
 
       try {
         const response = await axios.get(
-          `https://cdn.contentstack.io/v3/content_types/internal_portfolio/entries`,
+          `https://cdn.contentstack.io/v3/content_types/portfolio/entries`,
           {
             params: {
               environment: import.meta.env.VITE_ENVIRONMENT,
@@ -35,19 +36,24 @@ const Hero = () => {
             },
           }
         );
+
+        console.log("Fetched entries:", response.data.entries);
         setPosts(response.data.entries);
       } catch (error) {
-        console.error("Error fetching blog posts:", error);
+        console.error("Error fetching content:", error);
         if (error.response) {
           console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
+          console.error("Status:", error.response.status);
+          console.error("Headers:", error.response.headers);
         }
+      } finally {
+        setIsLoading(false); // Set loading to false after fetching is done
       }
     };
 
     fetchEntries();
   }, []);
+
   useScrollToSection(activeSection === "home" ? "hero" : null);
 
   const settings = {
@@ -60,33 +66,59 @@ const Hero = () => {
     autoplay: true,
     autoplaySpeed: 3000,
     fade: true,
-    cssEase: "linear", 
+    cssEase: "linear",
   };
 
-  const banners = posts.map((post) => ({
-    text: post.hero_section?.hero_text,
-    image: post.hero_section?.hero_banner.url || "", // optional chaining to avoid crash if undefined
-  }));
-  
+  const banners = posts.flatMap((post, postIndex) => {
+    if (!Array.isArray(post.portfolio_page)) {
+      return [];
+    }
+
+    return post.portfolio_page.flatMap((block, blockIndex) => {
+      if (!block.hero_section) return [];
+
+      const text = block.hero_section.hero_text || "Default hero text"; // Default text if missing
+      const image = block.hero_section.banner_image?.url || "https://via.placeholder.com/1200x500.png?text=No+Image"; // Placeholder if no image
+
+
+      return image ? [{ text, image }] : [];
+    });
+  });
+
+  console.log("Final banners array:", banners);
+
+  // If there's no data, show loading or fallback message
+  if (isLoading) {
+    return (
+      <section id="hero" className="pb-20">
+        <div className="text-center text-gray-500">Loading banners...</div>
+      </section>
+    );
+  }
 
   return (
     <section id="hero" className="pb-20">
-      <Slider {...settings}>
-        {banners.map((banner, index) => (
-          <div key={index} className="relative w-full h-[500px]">
-            <img
-              src={banner.image}
-              alt={banner.text}
-              className="w-full h-full object-cover rounded-lg"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <h1 className="text-white text-4xl font-bold text-center px-4">
-                {banner.text}
-              </h1>
+      {banners.length === 0 ? (
+        <div className="text-center text-gray-500">No banners to show.</div>
+      ) : (
+        <Slider {...settings}>
+          {banners.map((banner, index) => (
+            <div key={index} className="relative w-full h-[500px]">
+              <img
+                src={banner.image}
+                alt={banner.text || "Hero image"}
+                className="w-full h-full object-cover rounded-lg"
+                onError={(e) => e.target.src = "https://via.placeholder.com/1200x500.png?text=Error+Loading+Image"} // Fallback on error
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <h1 className="text-white text-4xl font-bold text-center px-4">
+                  {banner.text}
+                </h1>
+              </div>
             </div>
-          </div>
-        ))}
-      </Slider>
+          ))}
+        </Slider>
+      )}
     </section>
   );
 };
