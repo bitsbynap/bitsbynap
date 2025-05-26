@@ -1,4 +1,4 @@
-import React from "react";
+import emailjs from "emailjs-com"
 import { useSection } from '../../context/SectionContext';
 import { useScrollToSection } from '../../hooks/useScrollToSection';
 import { useState, useEffect, useMemo } from 'react';
@@ -138,28 +138,63 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormStatus({ submitting: true, success: false, error: null });
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setFormStatus({ submitting: true, success: false, error: null });
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setFormStatus({ submitting: false, success: true, error: null });
-      setFormData({ name: '', email: '', message: '' });
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setFormStatus(prev => ({ ...prev, success: false }));
-      }, 3000);
-    } catch (error) {
-      setFormStatus({
-        submitting: false,
-        success: false,
-        error: "Failed to send message. Please try again."
-      });
-    }
+  const ownerEmail = "nikhil.gahlaut@startappss.com";  // Replace  your email address
+
+  const templateParamsOwner = {
+    from_name: formData.name,
+    from_email: formData.email,
+    message: formData.message,
+    to_email: ownerEmail,  // Add the recipient email here
   };
+
+const templateParamsSender = {
+  from_name: formData.name,
+  from_email: formData.email,
+  to_email: formData.email, // This is required by EmailJS to send the email
+  message: formData.message,
+};
+
+
+  try {
+    // Send email to owner (website owner)
+    await emailjs.send(
+      'service_gew3s3l',       // Replace  service ID
+      'template_9q6j2pa',     // Replace the owner template ID
+      templateParamsOwner,
+      'k_RwrE_XXrYqZru-R'        // Replace your public key
+    );
+
+    // Send confirmation email to sender (person filling out the form)
+    await emailjs.send(
+      'service_gew3s3l',       // Replace  your service ID
+      'template_5g8kwjx',    // Replace  the sender template ID
+      templateParamsSender,
+      'k_RwrE_XXrYqZru-R'        // Replace  your public key
+    );
+
+    setFormStatus({ submitting: false, success: true, error: null });
+    setFormData({ name: '', email: '', message: '' });
+
+    setTimeout(() => {
+      setFormStatus(prev => ({ ...prev, success: false }));
+    }, 3000);
+
+  } catch (error) {
+    console.error("EmailJS error:", error);
+    setFormStatus({
+      submitting: false,
+      success: false,
+      error: "Failed to send message. Please try again."
+    });
+  }
+};
+
+
+
 
   if (isLoading) {
     return <LoadingSkeleton />;
