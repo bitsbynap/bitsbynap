@@ -12,12 +12,12 @@ const DynamicGrid = ({ items = [] }) => {
       {items.map((item, index) => (
         <div
           key={index}
-          className="flex items-center justify-center bg-white rounded-lg shadow p-4 hover:shadow-md transition"
+          className="group relative flex items-center justify-center bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
         >
           <img
             src={item.image}
             alt={`Client ${index + 1}`}
-            className="max-h-24 object-contain"
+            className="max-h-24 object-contain transition-transform duration-300 group-hover:scale-110"
           />
         </div>
       ))}

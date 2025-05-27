@@ -5,7 +5,11 @@ export default {
     'animated-gradient',
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'gradient': 'gradient 15s ease infinite',
+      },
+    },
   },
   plugins: [],
 };

@@ -1,67 +1,36 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useSection } from '../../context/SectionContext';
-import { useScrollToSection } from '../../hooks/useScrollToSection';
-import axios from 'axios';
-import ENV from '../../../env';
+import React from "react";
+import { useSection } from "../../context/SectionContext";
+import { useScrollToSection } from "../../hooks/useScrollToSection";
 import DynamicGrid from "../common/DynamicGrid";
+import { useNavigate } from "react-router-dom";
+import useContentstack from "../../hooks/useContentstack";
 
 const Portfolio = () => {
   const { activeSection } = useSection();
-  useScrollToSection(activeSection === 'portfolio' ? 'portfolio' : null);
+  useScrollToSection(activeSection === "portfolio" ? "portfolio" : null);
+  const navigate = useNavigate();
+  const { data: entries, isLoading, error } = useContentstack('portfolio');
 
-  const [entries, setEntries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const projects = entries.flatMap((entry) => {
+    if (!entry.portfolio_page) return [];
+    if (!Array.isArray(entry.portfolio_page)) return [];
 
-  useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          `https://cdn.contentstack.io/v3/content_types/portfolio/entries`,
-          {
-            params: { environment: ENV.CONTENTSTACK_ENVIRONMENT },
-            headers: {
-              api_key: ENV.CONTENTSTACK_API_KEY,
-              access_token: ENV.CONTENTSTACK_DELIVERY_TOKEN,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setEntries(response.data.entries);
-      } catch (error) {
-        console.error("Error fetching content:", error);
-        setError(error.message || "Failed to fetch portfolio");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    return entry.portfolio_page.flatMap((block) => {
+      if (!block.clients) return [];
 
-    fetchEntries();
-  }, []);
-
-  const projects = useMemo(() => {
-    return entries.flatMap((entry) => {
-      if (!Array.isArray(entry.portfolio_page)) return [];
-
-      return entry.portfolio_page.flatMap((block) => {
-        try {
-          const imageUrl = block.clients?.client?.url;
-          if (!imageUrl) return [];
-
-          return [{
-            image: imageUrl
-          }];
-        } catch (err) {
-          console.error("Error processing block:", err);
-          return [];
-        }
+      const clientsArray = Array.isArray(block.clients) ? block.clients : [block.clients];
+      
+      return clientsArray.map((client) => {
+        const imageUrl = client.image?.url || client.client?.url;
+        return {
+          image: imageUrl || "",
+        };
       });
     });
-  }, [entries]);
+  });
 
   return (
-<section id="portfolio" className="animated-gradient py-20 animate-fadeIn relative text-white">
+    <section id="portfolio" className="animated-gradient py-20 animate-fadeIn relative text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
           Some of our preferred Clients
@@ -69,17 +38,22 @@ const Portfolio = () => {
 
         {isLoading && <p className="text-center">Loading...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
-        {!isLoading && !error && (
+        {!isLoading && !error && projects.length === 0 && (
+          <p className="text-center text-gray-500">No clients found</p>
+        )}
+        {!isLoading && !error && projects.length > 0 && (
           <DynamicGrid items={projects} />
         )}
         <div className="flex justify-center mt-6">
-          <button className="bg-red-700 text-white py-2 px-4 hover:bg-red-800 transition rounded-xl">
+          <button 
+            onClick={() => navigate('/clients')}
+            className="bg-indigo-600 text-white py-2 px-4 hover:bg-indigo-700 transition rounded-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
             See more...
           </button>
         </div>
       </div>
     </section>
-
   );
 };
 

@@ -1,12 +1,10 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useSection } from "../../context/SectionContext";
 import { useScrollToSection } from "../../hooks/useScrollToSection";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import axios from "axios";
-import ENV from "../../../env";
-import Card from "../common/Card";
+import useContentstack from "../../hooks/useContentstack";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Error Boundary Component
@@ -30,40 +28,10 @@ class SliderErrorBoundary extends React.Component {
 const Services = () => {
   const { activeSection } = useSection();
   useScrollToSection(activeSection === "services" ? "services" : null);
-  const [entries, setEntries] = useState([]);
+  const { data: entries, isLoading, error } = useContentstack('portfolio');
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [sliderRef, setSliderRef] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await axios.get(
-          `https://cdn.contentstack.io/v3/content_types/portfolio/entries`,
-          {
-            params: { environment: ENV.CONTENTSTACK_ENVIRONMENT },
-            headers: {
-              api_key: ENV.CONTENTSTACK_API_KEY,
-              access_token: ENV.CONTENTSTACK_DELIVERY_TOKEN,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setEntries(response.data.entries);
-      } catch (error) {
-        setError(error.message || "Failed to fetch services");
-        console.error("Error fetching content:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchEntries();
-  }, []);
 
   const data = useMemo(() => {
     return entries
@@ -134,30 +102,29 @@ const Services = () => {
     [isInitialized, data.length]
   );
 
-  const renderCards = useMemo(() => {
-    return data.map((service, index) => {
-      const isActive = index === activeIndex;
-      const isMiddleSlide = index === Math.floor(data.length / 2);
+  if (isLoading) {
+    return (
+      <section id="services" className="py-16">
+        <div className="text-center text-gray-500">Loading services...</div>
+      </section>
+    );
+  }
 
-      return (
-        <div key={index} className="px-2">
-          <div
-            className={`transition-all duration-500 ease-in-out ${
-              isActive || (!isInitialized && isMiddleSlide)
-                ? "scale-100 opacity-100 blur-0"
-                : "md:scale-90 md:opacity-50 md:blur-sm scale-100 opacity-100 blur-0"
-            }`}
-          >
-            <Card
-              title={service.title}
-              description={service.description}
-              image={service.image}
-            />
-          </div>
-        </div>
-      );
-    });
-  }, [data, activeIndex, isInitialized]);
+  if (error) {
+    return (
+      <section id="services" className="py-16">
+        <div className="text-center text-red-500">{error}</div>
+      </section>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <section id="services" className="py-16">
+        <div className="text-center text-gray-500">No services available</div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -237,7 +204,26 @@ const Services = () => {
 
             <SliderErrorBoundary>
               <Slider ref={setSliderRef} {...settings}>
-                {renderCards}
+                {data.map((service, index) => (
+                  <div key={index} className="px-4">
+                    <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105">
+                      <div className="relative h-48">
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/400x300?text=Error+Loading+Image";
+                          }}
+                        />
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                        <p className="text-gray-600">{service.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </Slider>
             </SliderErrorBoundary>
           </>
