@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useSection } from "../../context/SectionContext";
 import { useScrollToSection } from "../../hooks/useScrollToSection";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import useContentstack from "../../hooks/useContentstack";
+import Card from "../common/Card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Error Boundary Component
@@ -60,6 +61,14 @@ const Services = () => {
       .filter((service) => service.checked === true);
   }, [entries]);
 
+  // Reset slider when data changes
+  useEffect(() => {
+    if (sliderRef && data.length > 0) {
+      sliderRef.slickGoTo(0);
+      setActiveIndex(0);
+    }
+  }, [data, sliderRef]);
+
   const settings = useMemo(
     () => ({
       infinite: data.length > 1,
@@ -102,6 +111,31 @@ const Services = () => {
     [isInitialized, data.length]
   );
 
+  const renderCards = useMemo(() => {
+    return data.map((service, index) => {
+      const isActive = index === activeIndex;
+      const isMiddleSlide = index === Math.floor(data.length / 2);
+
+      return (
+        <div key={index} className="px-2">
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              isActive || (!isInitialized && isMiddleSlide)
+                ? "scale-100 opacity-100 blur-0"
+                : "md:scale-90 md:opacity-50 md:blur-sm scale-100 opacity-100 blur-0"
+            }`}
+          >
+            <Card
+              title={service.title}
+              description={service.description}
+              image={service.image}
+            />
+          </div>
+        </div>
+      );
+    });
+  }, [data, activeIndex, isInitialized]);
+
   if (isLoading) {
     return (
       <section id="services" className="py-16">
@@ -143,90 +177,44 @@ const Services = () => {
                 key={index}
                 className="transform transition-all duration-500 hover:scale-105 w-full sm:max-w-sm"
               >
-                <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="relative overflow-hidden group">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-bold mb-2 text-gray-800">
-                      {service.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
+                <Card
+                  title={service.title}
+                  description={service.description}
+                  image={service.image}
+                />
               </div>
             ))}
           </div>
         ) : (
-          <>
+          <div className="relative">
             {/* Arrow Controls */}
-            <div className="absolute top-1/2 left-0 right-0 px-4 -translate-y-1/2 z-10">
-              {/* Desktop Arrow Controls (visible only on md and up) */}
-              <div className="hidden md:flex justify-between items-center">
-                <button
-                  className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300"
-                  onClick={() => sliderRef?.slickPrev()}
-                >
-                  <ChevronLeft />
-                </button>
-                <button
-                  className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300"
-                  onClick={() => sliderRef?.slickNext()}
-                >
-                  <ChevronRight />
-                </button>
-              </div>
-
-              {/* Mobile Arrow Controls (visible only on sm and below) */}
-              <div className="md:hidden flex justify-between items-center">
-                <button
-                  className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300"
-                  onClick={() => sliderRef?.slickPrev()}
-                >
-                  <ChevronLeft />
-                </button>
-                <button
-                  className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300"
-                  onClick={() => sliderRef?.slickNext()}
-                >
-                  <ChevronRight />
-                </button>
+            <div className="absolute top-1/2 -translate-y-1/2 z-10 w-full pointer-events-none">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center pointer-events-auto">
+                  <button
+                    className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300 shadow-lg"
+                    onClick={() => sliderRef?.slickPrev()}
+                    aria-label="Previous service"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300 shadow-lg"
+                    onClick={() => sliderRef?.slickNext()}
+                    aria-label="Next service"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
             </div>
 
             <SliderErrorBoundary>
               <Slider ref={setSliderRef} {...settings}>
-                {data.map((service, index) => (
-                  <div key={index} className="px-4">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105">
-                      <div className="relative h-48">
-                        <img
-                          src={service.image}
-                          alt={service.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = "https://via.placeholder.com/400x300?text=Error+Loading+Image";
-                          }}
-                        />
-                      </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                        <p className="text-gray-600">{service.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {renderCards}
               </Slider>
             </SliderErrorBoundary>
-          </>
+          </div>
         )}
       </div>
     </section>
