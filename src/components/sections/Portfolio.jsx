@@ -30,16 +30,16 @@ const Portfolio = () => {
   });
 
   return (
-    <section id="portfolio" className="animated-gradient py-20 animate-fadeIn relative text-white">
+    <section id="portfolio" className="py-20 bg-gray-100 dark:bg-dark-bg animate-fadeIn relative transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100">
           Some of our preferred Clients
         </h2>
 
-        {isLoading && <p className="text-center">Loading...</p>}
+        {isLoading && <p className="text-center text-gray-600 dark:text-gray-300">Loading...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
         {!isLoading && !error && projects.length === 0 && (
-          <p className="text-center text-gray-500">No clients found</p>
+          <p className="text-center text-gray-500 dark:text-gray-400">No clients found</p>
         )}
         {!isLoading && !error && projects.length > 0 && (
           <DynamicGrid items={projects} />

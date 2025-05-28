@@ -1,4 +1,5 @@
 import { SectionProvider } from "./context/SectionContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
@@ -11,26 +12,28 @@ import AllClients from "./components/pages/AllClients";
 
 function App() {
   return (
-    <Router>
+    <ThemeProvider>
       <SectionProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Header />
-          <Routes>
-            <Route path="/" element={
-              <main className="pt-16">
-                <Hero />
-                <About />
-                <Services />
-                <Portfolio />
-                <Contact />
-              </main>
-            } />
-            <Route path="/clients" element={<AllClients />} />
-          </Routes>
-          <Footer />
-        </div>
+        <Router>
+          <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
+            <Header />
+            <Routes>
+              <Route path="/" element={
+                <main className="pt-16">
+                  <Hero />
+                  <About />
+                  <Services />
+                  <Portfolio />
+                  <Contact />
+                </main>
+              } />
+              <Route path="/clients" element={<AllClients />} />
+            </Routes>
+            <Footer />
+          </div>
+        </Router>
       </SectionProvider>
-    </Router>
+    </ThemeProvider>
   );
 }
 

@@ -163,10 +163,10 @@ const Services = () => {
   return (
     <section
       id="services"
-      className="bg-gray-100 py-20 animate-fadeIn relative"
+      className="bg-gray-100 dark:bg-dark-bg py-20 animate-fadeIn relative transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100">
           Our Services
         </h2>
 
@@ -192,14 +192,14 @@ const Services = () => {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center pointer-events-auto">
                   <button
-                    className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300 shadow-lg"
+                    className="w-12 h-12 rounded-full bg-black dark:bg-gray-800 text-white flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 shadow-lg"
                     onClick={() => sliderRef?.slickPrev()}
                     aria-label="Previous service"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button
-                    className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors duration-300 shadow-lg"
+                    className="w-12 h-12 rounded-full bg-black dark:bg-gray-800 text-white flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 shadow-lg"
                     onClick={() => sliderRef?.slickNext()}
                     aria-label="Next service"
                   >

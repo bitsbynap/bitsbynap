@@ -41,7 +41,7 @@ const Hero = () => {
   if (isLoading) {
     return (
       <section id="hero" className="pb-20">
-        <div className="text-center text-gray-500">Loading banners...</div>
+        <div className="text-center text-gray-500 dark:text-gray-400">Loading banners...</div>
       </section>
     );
   }
@@ -57,13 +57,13 @@ const Hero = () => {
   if (banners.length === 0) {
     return (
       <section id="hero" className="pb-20">
-        <div className="text-center text-gray-500">No banners available</div>
+        <div className="text-center text-gray-500 dark:text-gray-400">No banners available</div>
       </section>
     );
   }
 
   return (
-    <section id="hero" className="pb-20">
+    <section id="hero" className="pb-20 bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
       <Slider {...settings}>
         {banners.map((banner, index) => (
           <div key={index} className="relative">
