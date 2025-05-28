@@ -24,7 +24,7 @@ const AllClients = () => {
   }, [entries]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg py-20 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg py-20 transition-colors duration-300 pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100">
           Our Clients

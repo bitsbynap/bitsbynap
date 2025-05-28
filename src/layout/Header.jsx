@@ -68,7 +68,7 @@ const Header = () => {
 
       {/* Mobile menu */}
       <div
-        className={`sm:hidden fixed top-0 right-0 w-3/4 max-w-xs h-full bg-white shadow-md z-40 transform transition-all duration-300 ease-in-out ${
+        className={`sm:hidden fixed top-0 right-0 w-3/4 max-w-xs h-full bg-white dark:bg-dark-card shadow-md z-40 transform transition-all duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -82,8 +82,8 @@ const Header = () => {
               }}
               className={`text-left px-4 py-2 rounded-md transition-all duration-300 focus:outline-none transform hover:scale-105 ${
                 activeSection === section
-                  ? 'text-indigo-600 font-semibold bg-indigo-50'
-                  : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100'
+                  ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-dark-bg'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-dark-bg'
               }`}
             >
               {section.charAt(0).toUpperCase() + section.slice(1)}
