@@ -124,10 +124,10 @@ const Contact = () => {
         });
       })
       .filter((info) => info.checked === true)[0] || {
-        email: "contact@example.com",
-        phone: "+1 234 567 890",
-        address: "123 Business Street, City, Country"
-      };
+      email: "contact@example.com",
+      phone: "+1 234 567 890",
+      address: "123 Business Street, City, Country"
+    };
   }, [entries]);
 
   const handleInputChange = (e) => {
@@ -138,60 +138,60 @@ const Contact = () => {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setFormStatus({ submitting: true, success: false, error: null });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormStatus({ submitting: true, success: false, error: null });
 
-  const ownerEmail = "nikhil.gahlaut@startappss.com";  // Replace  your email address
+    const ownerEmail = "nikhil.gahlaut@startappss.com";  // Replace  your email address
 
-  const templateParamsOwner = {
-    from_name: formData.name,
-    from_email: formData.email,
-    message: formData.message,
-    to_email: ownerEmail,  // Add the recipient email here
+    const templateParamsOwner = {
+      from_name: formData.name,
+      from_email: formData.email,
+      message: formData.message,
+      to_email: ownerEmail,  // Add the recipient email here
+    };
+
+    const templateParamsSender = {
+      from_name: formData.name,
+      from_email: formData.email,
+      to_email: formData.email, // This is required by EmailJS to send the email
+      message: formData.message,
+    };
+
+
+    try {
+      // Send email to owner (website owner)
+      await emailjs.send(
+        'service_gew3s3l',       // Replace  service ID
+        'template_9q6j2pa',     // Replace the owner template ID
+        templateParamsOwner,
+        'k_RwrE_XXrYqZru-R'        // Replace your public key
+      );
+
+      // Send confirmation email to sender (person filling out the form)
+      await emailjs.send(
+        'service_gew3s3l',       // Replace  your service ID
+        'template_5g8kwjx',    // Replace  the sender template ID
+        templateParamsSender,
+        'k_RwrE_XXrYqZru-R'        // Replace  your public key
+      );
+
+      setFormStatus({ submitting: false, success: true, error: null });
+      setFormData({ name: '', email: '', message: '' });
+
+      setTimeout(() => {
+        setFormStatus(prev => ({ ...prev, success: false }));
+      }, 3000);
+
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      setFormStatus({
+        submitting: false,
+        success: false,
+        error: "Failed to send message. Please try again."
+      });
+    }
   };
-
-const templateParamsSender = {
-  from_name: formData.name,
-  from_email: formData.email,
-  to_email: formData.email, // This is required by EmailJS to send the email
-  message: formData.message,
-};
-
-
-  try {
-    // Send email to owner (website owner)
-    await emailjs.send(
-      'service_gew3s3l',       // Replace  service ID
-      'template_9q6j2pa',     // Replace the owner template ID
-      templateParamsOwner,
-      'k_RwrE_XXrYqZru-R'        // Replace your public key
-    );
-
-    // Send confirmation email to sender (person filling out the form)
-    await emailjs.send(
-      'service_gew3s3l',       // Replace  your service ID
-      'template_5g8kwjx',    // Replace  the sender template ID
-      templateParamsSender,
-      'k_RwrE_XXrYqZru-R'        // Replace  your public key
-    );
-
-    setFormStatus({ submitting: false, success: true, error: null });
-    setFormData({ name: '', email: '', message: '' });
-
-    setTimeout(() => {
-      setFormStatus(prev => ({ ...prev, success: false }));
-    }, 3000);
-
-  } catch (error) {
-    console.error("EmailJS error:", error);
-    setFormStatus({
-      submitting: false,
-      success: false,
-      error: "Failed to send message. Please try again."
-    });
-  }
-};
 
 
 
@@ -219,13 +219,19 @@ const templateParamsSender = {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  <a href={`mailto:${contactInfo.email}`} className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  <a
+                    href={`mailto:${contactInfo.email}`}
+                    className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  >
                     {contactInfo.email}
                   </a>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  <a href={`tel:${contactInfo.phone}`} className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  <a
+                    href={`tel:${contactInfo.phone}`}
+                    className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  >
                     {contactInfo.phone}
                   </a>
                 </div>
@@ -251,9 +257,8 @@ const templateParamsSender = {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-white placeholder-white autofill:!bg-transparent autofill:!text-white focus:outline-none focus:border-indigo-500"
+                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white autofill:!bg-transparent autofill:!text-gray-900 dark:autofill:!text-white focus:outline-none focus:border-indigo-500"
                 />
-
               </div>
 
               <div>
@@ -266,9 +271,8 @@ const templateParamsSender = {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-white placeholder-white autofill:!bg-transparent autofill:!text-white focus:outline-none focus:border-indigo-500"
+                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white autofill:!bg-transparent autofill:!text-gray-900 dark:autofill:!text-white focus:outline-none focus:border-indigo-500"
                 />
-
               </div>
 
               <div>
@@ -281,18 +285,17 @@ const templateParamsSender = {
                   onChange={handleInputChange}
                   required
                   rows={4}
-                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-white placeholder-white autofill:!bg-transparent autofill:!text-white focus:outline-none focus:border-indigo-500"
+                  className="mt-1 block w-full bg-transparent border-b-2 border-gray-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white autofill:!bg-transparent autofill:!text-gray-900 dark:autofill:!text-white focus:outline-none focus:border-indigo-500"
                 />
-
               </div>
 
               <button
                 type="submit"
                 disabled={formStatus.submitting}
                 className={`w-full bg-indigo-600 dark:bg-indigo-500 text-white py-3 px-6 rounded-md font-semibold 
-      ${formStatus.submitting ? 'opacity-75 cursor-not-allowed' : 'hover:bg-indigo-700 dark:hover:bg-indigo-600'} 
-      focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg
-      transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
+        ${formStatus.submitting ? 'opacity-75 cursor-not-allowed' : 'hover:bg-indigo-700 dark:hover:bg-indigo-600'} 
+        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg
+        transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
               >
                 {formStatus.submitting ? (
                   <>
@@ -319,9 +322,9 @@ const templateParamsSender = {
                 </div>
               )}
             </form>
-
           </div>
         </div>
+
       </div>
       <ScrollToTop />
     </section>

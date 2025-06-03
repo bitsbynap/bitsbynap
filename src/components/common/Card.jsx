@@ -1,6 +1,17 @@
-const Card = ({ title, description, image }) => {
+import { useNavigate } from 'react-router-dom';
+
+const Card = ({ title, description, image, serviceId }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/services/${serviceId}`, { state: { title, description, image } });
+  };
+
   return (
-    <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl h-full transition-transform duration-500 hover:scale-105 hover:shadow-2xl overflow-hidden group relative">
+    <div 
+      onClick={handleClick}
+      className="bg-white dark:bg-dark-card rounded-2xl shadow-xl h-full transition-transform duration-500 hover:scale-105 hover:shadow-2xl overflow-hidden group relative cursor-pointer"
+    >
       {image && (
         <div className="h-52 w-full overflow-hidden">
           <img 

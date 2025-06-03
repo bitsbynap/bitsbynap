@@ -1,15 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSection } from "../../context/SectionContext";
 import { useScrollToSection } from "../../hooks/useScrollToSection";
 import DynamicGrid from "../common/DynamicGrid";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useContentstack from "../../hooks/useContentstack";
 
 const Portfolio = () => {
-  const { activeSection } = useSection();
+  const { activeSection, setActiveSection } = useSection();
   useScrollToSection(activeSection === "portfolio" ? "portfolio" : null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: entries, isLoading, error } = useContentstack('portfolio');
+
+  // Handle scroll position restoration
+  useEffect(() => {
+    if (location.state?.fromClients) {
+      // Clear the state after using it
+      window.history.replaceState({}, document.title);
+      // Scroll to portfolio section
+      const portfolioSection = document.getElementById('portfolio');
+      if (portfolioSection) {
+        portfolioSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
+  const handleSeeMore = () => {
+    // Store current scroll position before navigation
+    const portfolioSection = document.getElementById('portfolio');
+    if (portfolioSection) {
+      sessionStorage.setItem('portfolioScrollPosition', portfolioSection.offsetTop.toString());
+    }
+    navigate('/clients');
+  };
 
   const projects = entries.flatMap((entry) => {
     if (!entry.portfolio_page) return [];
@@ -44,12 +67,12 @@ const Portfolio = () => {
         {!isLoading && !error && projects.length > 0 && (
           <DynamicGrid items={projects} />
         )}
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center mt-8">
           <button 
-            onClick={() => navigate('/clients')}
-            className="bg-indigo-600 text-white py-2 px-4 hover:bg-indigo-700 transition rounded-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            onClick={handleSeeMore}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
           >
-            See more...
+            See More Clients
           </button>
         </div>
       </div>

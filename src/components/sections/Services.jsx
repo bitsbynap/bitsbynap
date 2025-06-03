@@ -34,47 +34,49 @@ const Services = () => {
   const [sliderRef, setSliderRef] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const data = useMemo(() => {
-    return entries
-      .flatMap((entry) => {
-        if (!Array.isArray(entry.portfolio_page)) return [];
-        return entry.portfolio_page.flatMap((block) => {
-          if (!block.services) return [];
-          try {
-            return [
-              {
-                title: block.services.title || "Service Title",
-                description:
-                  block.services.description || "No description available",
-                image:
-                  block.services.image?.url ||
-                  "https://via.placeholder.com/400x300?text=No+Image",
-                checked: block.services.checked ?? true,
-              },
-            ];
-          } catch (error) {
-            console.error("Error processing service block:", error);
-            return [];
-          }
-        });
-      })
-      .filter((service) => service.checked === true);
+  const services = useMemo(() => {
+    if (!entries) return [];
+    return entries.flatMap((entry) => {
+      if (!Array.isArray(entry.portfolio_page)) return [];
+      return entry.portfolio_page.flatMap((block) => {
+        if (!block.services) return [];
+        try {
+          return [{
+            id: block.services.id || block.services.title?.toLowerCase().replace(/\s+/g, '-'),
+            title: block.services.title || "Service Title",
+            description: block.services.description || "No description available",
+            image: block.services.image?.url || "https://via.placeholder.com/400x300?text=No+Image",
+            techStack: block.services.tech_stack || [],
+            useCases: block.services.use_cases || [],
+            features: block.services.features || [],
+            benefits: block.services.benefits || [],
+            clients: block.services.clients || [],
+            process: block.services.process || [],
+            faqs: block.services.faqs || [],
+            checked: block.services.checked ?? true,
+          }];
+        } catch (error) {
+          console.error("Error processing service block:", error);
+          return [];
+        }
+      });
+    }).filter(service => service.checked === true);
   }, [entries]);
 
   // Reset slider when data changes
   useEffect(() => {
-    if (sliderRef && data.length > 0) {
+    if (sliderRef && services.length > 0) {
       sliderRef.slickGoTo(0);
       setActiveIndex(0);
     }
-  }, [data, sliderRef]);
+  }, [services, sliderRef]);
 
   const settings = useMemo(
     () => ({
-      infinite: data.length > 1,
-      centerMode: data.length > 3,
-      centerPadding: data.length > 3 ? "200px" : "0px",
-      slidesToShow: data.length > 3 ? 1 : Math.min(data.length, 3),
+      infinite: services.length > 1,
+      centerMode: services.length > 3,
+      centerPadding: services.length > 3 ? "200px" : "0px",
+      slidesToShow: services.length > 3 ? 1 : Math.min(services.length, 3),
       speed: 500,
       arrows: false,
       autoplay: false,
@@ -93,7 +95,7 @@ const Services = () => {
           settings: {
             centerMode: false,
             centerPadding: "0px",
-            slidesToShow: Math.min(data.length, 2),
+            slidesToShow: Math.min(services.length, 2),
             arrows: false,
           },
         },
@@ -108,16 +110,16 @@ const Services = () => {
         },
       ],
     }),
-    [isInitialized, data.length]
+    [isInitialized, services.length]
   );
 
   const renderCards = useMemo(() => {
-    return data.map((service, index) => {
+    return services.map((service, index) => {
       const isActive = index === activeIndex;
-      const isMiddleSlide = index === Math.floor(data.length / 2);
+      const isMiddleSlide = index === Math.floor(services.length / 2);
 
       return (
-        <div key={index} className="px-2">
+        <div key={service.id} className="px-2">
           <div
             className={`transition-all duration-500 ease-in-out ${
               isActive || (!isInitialized && isMiddleSlide)
@@ -126,6 +128,7 @@ const Services = () => {
             }`}
           >
             <Card
+              serviceId={service.id}
               title={service.title}
               description={service.description}
               image={service.image}
@@ -134,7 +137,7 @@ const Services = () => {
         </div>
       );
     });
-  }, [data, activeIndex, isInitialized]);
+  }, [services, activeIndex, isInitialized]);
 
   if (isLoading) {
     return (
@@ -142,16 +145,9 @@ const Services = () => {
         <div className="container mx-auto px-4">
           <div className="animate-pulse-slow">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mx-auto mb-12"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
-                  <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full mb-4"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-                  </div>
-                </div>
+                <div key={i} className="w-[300px] h-[500px] bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
               ))}
             </div>
           </div>
@@ -164,9 +160,7 @@ const Services = () => {
     return (
       <section className="py-20 bg-white dark:bg-dark-bg">
         <div className="container mx-auto px-4">
-          <div className="animate-fade-in text-red-500 dark:text-red-400 text-center">
-            {error}
-          </div>
+          <div className="text-center text-red-500">{error}</div>
         </div>
       </section>
     );
@@ -178,19 +172,17 @@ const Services = () => {
         <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100 animate-fade-in-down">
           Our Services
         </h2>
-        {data.length <= 3 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 justify-items-center px-4 sm:px-0">
-            {data.map((service, index) => (
-              <div
-                key={index}
-                className="transform transition-all duration-500 hover:scale-105 w-full sm:max-w-sm"
-              >
-                <Card
-                  title={service.title}
-                  description={service.description}
-                  image={service.image}
-                />
-              </div>
+        
+        {services.length <= 3 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            {services.map((service) => (
+              <Card
+                key={service.id}
+                serviceId={service.id}
+                title={service.title}
+                description={service.description}
+                image={service.image}
+              />
             ))}
           </div>
         ) : (
