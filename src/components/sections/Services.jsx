@@ -65,11 +65,15 @@ const Services = () => {
 
   // Reset slider when data changes
   useEffect(() => {
-    if (sliderRef && services.length > 0) {
-      sliderRef.slickGoTo(0);
-      setActiveIndex(0);
+    if (sliderRef && services.length > 0 && isInitialized) {
+      try {
+        sliderRef.slickGoTo(0);
+        setActiveIndex(0);
+      } catch (error) {
+        console.error('Error resetting slider:', error);
+      }
     }
-  }, [services, sliderRef]);
+  }, [services, sliderRef, isInitialized]);
 
   const settings = useMemo(
     () => ({
@@ -88,6 +92,9 @@ const Services = () => {
       },
       afterChange: () => {
         if (!isInitialized) setIsInitialized(true);
+      },
+      onInit: () => {
+        setIsInitialized(true);
       },
       responsive: [
         {
@@ -167,7 +174,7 @@ const Services = () => {
   }
 
   return (
-    <section id="services" className="py-20 bg-white dark:bg-dark-bg">
+    <section id="services" className="py-20 bg-gray-50 dark:bg-dark-bg animate-fadeIn transition-colors duration-300">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100 animate-fade-in-down">
           Our Services

@@ -10,10 +10,10 @@ const Card = ({ title, description, image, serviceId }) => {
   return (
     <div 
       onClick={handleClick}
-      className="bg-white dark:bg-dark-card rounded-2xl shadow-xl h-full transition-transform duration-500 hover:scale-105 hover:shadow-2xl overflow-hidden group relative cursor-pointer"
+      className="bg-white dark:bg-dark-card rounded-2xl shadow-xl h-[600px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl overflow-hidden group relative cursor-pointer"
     >
       {image && (
-        <div className="h-52 w-full overflow-hidden">
+        <div className="h-72 w-full overflow-hidden">
           <img 
             src={image} 
             alt={title} 
@@ -21,9 +21,9 @@ const Card = ({ title, description, image, serviceId }) => {
           />
         </div>
       )}
-      <div className="p-6 relative z-10">
-        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-4">{description}</p>
+      <div className="p-8 relative z-10 m-auto">
+        <h3 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">{title}</h3>
+        <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">{description}</p>
         {/* Optional buttons or links */}
         {/* <div className="flex gap-4">
           <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Demo</button>

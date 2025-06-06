@@ -65,16 +65,20 @@ const Portfolio = () => {
           <p className="text-center text-gray-500 dark:text-gray-400">No clients found</p>
         )}
         {!isLoading && !error && projects.length > 0 && (
-          <DynamicGrid items={projects} />
+          <>
+            <DynamicGrid items={projects.slice(0, 10)} />
+            {projects.length > 10 && (
+              <div className="flex justify-center mt-8">
+                <button 
+                  onClick={handleSeeMore}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                >
+                  See More Clients
+                </button>
+              </div>
+            )}
+          </>
         )}
-        <div className="flex justify-center mt-8">
-          <button 
-            onClick={handleSeeMore}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
-          >
-            See More Clients
-          </button>
-        </div>
       </div>
     </section>
   );

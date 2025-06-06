@@ -47,6 +47,10 @@ const AllClients = () => {
     });
   }, [entries]);
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <>
       <Header isScrolled={isScrolled} />
@@ -67,8 +71,8 @@ const AllClients = () => {
           </div>
         </div>
 
-        {/* Main content */}
-        <div className={`relative z-10 -mt-20 transition-all duration-300 ${isScrolled ? 'pt-24' : 'pt-0'}`}>
+        {/* Main content - Adjusted z-index */}
+        <div className={`relative z-0 -mt-20 transition-all duration-300 ${isScrolled ? 'pt-24' : 'pt-0'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {isLoading && (
               <div className="text-center bg-white dark:bg-dark-card rounded-2xl shadow-xl p-8">

@@ -288,8 +288,8 @@ const ServiceDetails = () => {
           </div>
         </div>
 
-        {/* Main content */}
-        <div className={`relative z-10 -mt-20 transition-all duration-300 ${isScrolled ? 'pt-24' : 'pt-0'}`}>
+        {/* Main content - Adjusted z-index */}
+        <div className={`relative z-0 -mt-20 transition-all duration-300 ${isScrolled ? 'pt-24' : 'pt-0'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
             <button

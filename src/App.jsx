@@ -10,8 +10,38 @@ import Services from "./components/sections/Services";
 import Portfolio from "./components/sections/Portfolio";
 import Contact from "./components/sections/Contact";
 import AllClients from "./components/pages/AllClients";
+import AboutUs from "./components/pages/AboutUs";
 import { useSection } from "./context/SectionContext";
 import ServiceDetails from './components/pages/ServiceDetails';
+import useContentstack from './hooks/useContentstack';
+
+// Protected Route component for clients page
+const ProtectedClientsRoute = () => {
+  const { data: entries, isLoading } = useContentstack('portfolio');
+  const location = useLocation();
+
+  // Calculate total clients count
+  const totalClients = entries?.flatMap((entry) => {
+    if (!Array.isArray(entry.portfolio_page)) return [];
+    return entry.portfolio_page.flatMap((block) => {
+      if (!block.clients) return [];
+      const clientsArray = Array.isArray(block.clients) ? block.clients : [block.clients];
+      return clientsArray.filter(client => client.image?.url || client.client?.url).length;
+    });
+  }).reduce((sum, count) => sum + count, 0) || 0;
+
+  if (isLoading) {
+    return null; // or a loading spinner
+  }
+
+  // If there are 10 or fewer clients, redirect to home
+  if (totalClients <= 10) {
+    return <Navigate to="/" state={{ fromClients: true }} replace />;
+  }
+
+  // If there are more than 10 clients, render the AllClients component
+  return <AllClients />;
+};
 
 // Wrapper component to handle navigation state
 const HomePage = () => {
@@ -61,7 +91,8 @@ function App() {
             <Header />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/clients" element={<AllClients />} />
+              <Route path="/clients" element={<ProtectedClientsRoute />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/services/:serviceId" element={<ServiceDetails />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
