@@ -113,3 +113,24 @@ input:focus, textarea:focus {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 } 
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background: linear-gradient(270deg, #ff7e5f, #feb47b, #ff7e5f);
+  background-size: 400% 400%;
+  animation: gradientAnimation 10s ease infinite;
+}
+
+
+
